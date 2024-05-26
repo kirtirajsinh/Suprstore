@@ -15,48 +15,38 @@ import {
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
-import { Check, CheckIcon, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { CaretSortIcon } from "@radix-ui/react-icons";
 
-const communityList: { id: number; value: string; label: string }[] = [
-  {
-    id: 1,
-    value: "Hangout India",
-    label: "Hangout India",
-  },
-  {
-    id: 2,
-    value: "Parkour",
-    label: "Parkour",
-  },
-];
+import { Checkbox } from "../ui/checkbox";
+
+type ActiveGuildType = {
+  serverId: string;
+  name: string;
+  serverIcon: string;
+  channelId: string;
+  memberCount: number;
+  active: boolean;
+  createdAt: Date;
+  description: string;
+};
 
 const formSchema = z.object({
   title: z.string().min(2).max(50),
   description: z.string().min(5).max(500),
   productUrl: z.string().url({ message: "Invalid url" }),
   channelId: z.array(z.string()).refine((value) => value.some((item) => item), {
-    message: "You have to select at least one item.",
+    message: "You have to select at least one Community.",
   }),
+  tagsSelected: z
+    .array(z.string())
+    .refine((value) => value.some((item) => item), {
+      message: "You have to select at least one tag.",
+    }),
   image: z.instanceof(File).refine((file) => file.size <= 10 * 1024 * 1024, {
     message: "Image file size must be less than 10MB",
   }),
 });
 
-const PostForm = () => {
+const PostForm = ({ activeGuilds }: { activeGuilds: ActiveGuildType[] }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -64,6 +54,7 @@ const PostForm = () => {
       description: "",
       productUrl: "",
       channelId: [],
+      tagsSelected: [],
       image: undefined,
     },
   });
@@ -118,78 +109,97 @@ const PostForm = () => {
               </FormItem>
             )}
           />
-
-          {/* <FormField
+          <FormField
             control={form.control}
-            name="channelId"
+            name="tagsSelected"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Community</FormLabel>
-                <FormControl>
-                  <select
-                    {...field}
-                    multiple
-                    onChange={(e) => {
-                      const selectedOptions = Array.from(
-                        e.target.selectedOptions,
-                        (option) => option.value
-                      );
-                      field.onChange(selectedOptions); // Update form field value directly
-                    }}
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                <div className="mb-4">
+                  <FormLabel className="text-base">Tags</FormLabel>
+                  <FormDescription>
+                    Select relevant tags for your Post.
+                  </FormDescription>
+                </div>
+                {activeGuilds?.map((guild) => (
+                  <FormItem
+                    key={guild.channelId}
+                    className="flex flex-row items-start space-x-3 space-y-0"
                   >
-                    <option value="">Select a community</option>
-                    {communityList.map((community) => (
-                      <option key={community.id} value={community.value}>
-                        {community.label}
-                      </option>
-                    ))}
-                  </select>
-                </FormControl>
-                <FormDescription>
-                  Select a community you want to launch/sell your product in
-                </FormDescription>
-                <FormMessage>
-                  {form.formState.errors.channelId?.message}
-                </FormMessage>
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value?.includes(guild.channelId)}
+                        onCheckedChange={(checked) => {
+                          return checked
+                            ? field.onChange([...field.value, guild.channelId])
+                            : field.onChange(
+                                field.value?.filter(
+                                  (value) => value !== guild.channelId
+                                )
+                              );
+                        }}
+                      />
+                    </FormControl>
+                    <FormLabel className="text-sm font-normal gap-4">
+                      <span>{guild.name}</span>
+                      <span>({guild.memberCount} members)</span>
+                    </FormLabel>
+                  </FormItem>
+                ))}
+                <FormMessage />
               </FormItem>
             )}
-          /> */}
+          />
 
           <FormField
             control={form.control}
             name="channelId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Community</FormLabel>
-                <FormControl>
-                  <select
-                    {...field}
-                    multiple
-                    value={field.value || []} // Set initial value to an empty array if field.value is falsy
-                    onChange={(e) => {
-                      const selectedOptions = Array.from(
-                        e.target.selectedOptions,
-                        (option) => option.value
+                <div className="mb-4">
+                  <FormLabel className="text-base">Communities</FormLabel>
+                  <FormDescription>
+                    Select Communities you want to Launch/Share your product
+                    with.
+                  </FormDescription>
+                </div>
+                {activeGuilds?.map((guild) => (
+                  <FormField
+                    key={guild.channelId}
+                    control={form.control}
+                    name="channelId"
+                    render={({ field }) => {
+                      return (
+                        <FormItem
+                          key={guild.channelId}
+                          className="flex flex-row items-start space-x-3 space-y-0"
+                        >
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value?.includes(guild.channelId)}
+                              onCheckedChange={(checked) => {
+                                return checked
+                                  ? field.onChange([
+                                      ...field.value,
+                                      guild.channelId,
+                                    ])
+                                  : field.onChange(
+                                      field.value?.filter(
+                                        (value) => value !== guild.channelId
+                                      )
+                                    );
+                              }}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal gap-4">
+                            <span>{guild.name}</span>
+                            <span>({guild.memberCount} members)</span>
+                          </FormLabel>
+                        </FormItem>
                       );
-                      field.onChange(selectedOptions); // Update form field value directly
                     }}
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  >
-                    <option value="">Select a community</option>
-                    {communityList.map((community) => (
-                      <option key={community.id} value={community.value}>
-                        {community.label}
-                      </option>
-                    ))}
-                  </select>
-                </FormControl>
-                <FormDescription>
-                  Select a community you want to launch/sell your product in
-                </FormDescription>
-                <FormMessage>
-                  {form.formState.errors.channelId?.message}
-                </FormMessage>
+                  />
+                ))}
+                <FormMessage />
               </FormItem>
             )}
           />
