@@ -55,6 +55,48 @@ model User {
   @@map("users")
 }
 
+model Guild {
+  serverId    String    @id @unique
+  name        String
+  serverIcon  String?
+  description String?
+  memberCount Int?
+  channelId   String?   @unique
+  channels    Channel[]
+
+  createdAt DateTime @default(now())
+  active    Boolean  @default(false)
+  Tag       Tag[]
+}
+
+model Channel {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  serverId    String
+  Discord     Guild   @relation(fields: [serverId], references: [serverId], onDelete: Cascade)
+
+  @@map("channels")
+}
+
+model Tag {
+  tagId String  @id @default(cuid())
+  name  String
+  posts Post[]
+  guild Guild[]
+}
+
+model Post {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  productUrl   String?
+  image        String?
+  channelId    String[]
+  createdAt    DateTime @default(now())
+  tagsSelected Tag[]
+}
+
 model VerificationToken {
   identifier String
   token      String
