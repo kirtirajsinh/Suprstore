@@ -2,14 +2,12 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
-import useDevice from "@/components/common/useDevice";
 import LoginButton from "./auth/LoginButton";
 import { Button } from "./ui/button";
 import { HoverBorderGradient } from "./ui/hover-border-gradient";
 
 const NavBar = () => {
   const router = useRouter();
-  const { isMobile, isDesktop } = useDevice();
   return (
     <>
       <div className="flex flex-row items-center justify-between p-2 md:m-6">
