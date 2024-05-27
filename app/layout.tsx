@@ -5,6 +5,7 @@ import SessionProvider from "@/components/common/SessionProvider";
 import { getServerSession } from "next-auth";
 import LoginButton from "@/components/auth/LoginButton";
 import NavBar from "@/components/NavBar";
+import ProviderWrapper from "@/components/common/dynamic-wrapper.js";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -17,17 +18,18 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession();
+  // const session = await getServerSession();
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <SessionProvider session={session}>
+      <ProviderWrapper>
+        <body className={inter.className}>
           <div className="flex flex-col mt-12 mb-4 max-w-7xl mx-auto w-full px-6 lg:px-0  min-h-screen">
             <NavBar />
+            {/* <DynamicWidget /> */}
             {children}
           </div>
-        </SessionProvider>
-      </body>
+        </body>
+      </ProviderWrapper>
     </html>
   );
 }

@@ -2,9 +2,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
-import LoginButton from "./auth/LoginButton";
+// import LoginButton from "./auth/LoginButton";
 import { Button } from "./ui/button";
 import { HoverBorderGradient } from "./ui/hover-border-gradient";
+import { DynamicWidget } from "@/lib/dynamic";
 
 const NavBar = () => {
   const router = useRouter();
@@ -28,7 +29,8 @@ const NavBar = () => {
           >
             Post
           </HoverBorderGradient>
-          <LoginButton />
+          {/* <LoginButton /> */}
+          <DynamicWidget />
         </div>
       </div>
     </>

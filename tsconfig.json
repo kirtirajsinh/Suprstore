@@ -26,7 +26,10 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "lib/auth.js"
+    "lib/auth.js",
+    "app/api/botdetails/route.js",
+    "components/common/dynamic-wrapper.js",
+    "lib/authHelpers.js"
   ],
   "exclude": ["node_modules"],
   "noImplicitAny": true
