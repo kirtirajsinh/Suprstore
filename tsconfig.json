@@ -29,7 +29,9 @@
     "lib/auth.js",
     "app/api/botdetails/route.js",
     "components/common/dynamic-wrapper.js",
-    "lib/authHelpers.js"
+    "lib/authHelpers.ts",
+    "app/api/auth/[...nextauth]/route.js",
+    "app/post/page.jsx"
   ],
   "exclude": ["node_modules"],
   "noImplicitAny": true
