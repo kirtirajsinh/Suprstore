@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import SessionProvider from "@/components/common/SessionProvider";
-import { getServerSession } from "next-auth";
-import LoginButton from "@/components/auth/LoginButton";
+import { auth } from "@/lib/auth.js";
 import NavBar from "@/components/NavBar";
 import ProviderWrapper from "@/components/common/dynamic-wrapper.js";
 const inter = Inter({ subsets: ["latin"] });
@@ -18,17 +17,24 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // const session = await getServerSession();
+  const session = await auth();
+  if (session?.user) {
+    // filter out sensitive data before passing to client.
+    session.user = {
+      name: session.user.name,
+      email: session.user.email,
+      image: session.user.image,
+    };
+  }
   return (
     <html lang="en">
       <ProviderWrapper>
-        <body className={inter.className}>
-          <div className="flex flex-col mt-12 mb-4 max-w-7xl mx-auto w-full px-6 lg:px-0  min-h-screen">
+        <SessionProvider session={session}>
+          <body className={inter.className}>
             <NavBar />
-            {/* <DynamicWidget /> */}
             {children}
-          </div>
-        </body>
+          </body>
+        </SessionProvider>
       </ProviderWrapper>
     </html>
   );
