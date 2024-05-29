@@ -17,16 +17,18 @@ import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 
 import { Checkbox } from "../ui/checkbox";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { auth } from "@/lib/auth";
 
 type ActiveGuildType = {
-  serverId: string;
-  name: string;
-  serverIcon: string;
+  serverId: string | null;
+  name: string | null;
+  serverIcon: string | null;
   channelId: string;
-  memberCount: number;
+  memberCount: number | null;
   active: boolean;
   createdAt: Date;
-  description: string;
+  description: string | null;
 };
 
 const formSchema = z.object({
@@ -127,7 +129,7 @@ const PostForm = ({ activeGuilds }: { activeGuilds: ActiveGuildType[] }) => {
                   >
                     <FormControl>
                       <Checkbox
-                        checked={field.value?.includes(guild.channelId)}
+                        checked={field.value?.includes(guild?.channelId)}
                         onCheckedChange={(checked) => {
                           return checked
                             ? field.onChange([...field.value, guild.channelId])
@@ -175,7 +177,7 @@ const PostForm = ({ activeGuilds }: { activeGuilds: ActiveGuildType[] }) => {
                         >
                           <FormControl>
                             <Checkbox
-                              checked={field.value?.includes(guild.channelId)}
+                              checked={field.value?.includes(guild?.channelId)}
                               onCheckedChange={(checked) => {
                                 return checked
                                   ? field.onChange([
